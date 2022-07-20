@@ -1,0 +1,14 @@
+{
+    success: true,
+    message: 'Hello World!',
+    data: {
+        name: 'John Doe',
+    }
+
+}
+
+{
+    success: false,
+    message: `Error: ${error.code}`,
+    data: []
+}

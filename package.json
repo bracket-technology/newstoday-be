@@ -1,0 +1,23 @@
+{
+  "name": "dailynews-be",
+  "version": "1.0.0",
+  "description": "daily news backend",
+  "main": "index.js",
+  "repository": "https://github.com/bracket-technology",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.27.2",
+    "body-parser": "^1.20.0",
+    "cors": "^2.8.5",
+    "crypto-js": "^4.1.1",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "express-winston": "^4.2.0",
+    "fs": "^0.0.1-security",
+    "jsonwebtoken": "^8.5.1",
+    "moment": "^2.29.4",
+    "multer": "^1.4.5-lts.1",
+    "mysql": "^2.18.1",
+    "nodemon": "^2.0.19"
+  }
+}
