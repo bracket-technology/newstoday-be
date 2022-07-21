@@ -32,5 +32,5 @@ app.use('/api/v1', router)
 
 
 app.listen(port, () => {
-  console.log(`Tickitz Backend listening on port ${port}`)
+  console.log(`Backend listening on port ${port}`)
 })

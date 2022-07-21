@@ -1,26 +1,59 @@
 const db = require('../helpers/db_conn')
+const CryptoJS = require("crypto-js")
 const fs = require('fs')
 
 module.exports = {
-    //referensi search github movie(dhani)
     getByAdmin: (req, res)=> {
-        const { search, date, orderBy } = req.query
+        const { userId } = req.body
+        const { search, orderBy } = req.query
         const page = parseInt(req.query.page)
         const limit = parseInt(req.query.limit)
-        // const yearNow = new Date().getFullYear()
         const offset = (page - 1) * limit
-
         return new Promise((resolve, reject)=> {
-            const sql = `SELECT * FROM users LIMIT ${limit} OFFSET ${offset}`
+            const sql = `SELECT * FROM users ${userId ? `WHERE userId LIKE '%${userId}%'` : search ? `WHERE username LIKE '%${search}%' OR email LIKE '%${search}%' OR phone LIKE '%${search}%' OR job LIKE '%${search}%'` : orderBy ? `ORDER BY userId ${orderBy}` : ''} ${page && limit ? `LIMIT ${limit} OFFSET ${offset}` : ''}`
             db.query(sql,(err, results)=> {
             if(err) {
-                reject({message: "ada error"})
+                reject({
+                    success: false,
+                    message: `Error: ${err.code}`,
+                    data: []
+                })
+            } else {
+                db.query(`SELECT userId from users`, (err, results1)=> {
+                    if(err) {
+                        reject({
+                            success: false,
+                            message: `Error: ${err.code}`,
+                            data: []
+                        })
+                    } else {
+                        totalPage = Math.ceil(results1.length / limit) 
+                        if(search){
+                            totalPage = Math.ceil(results.length / limit)
+                        }
+                            if(isNaN(limit) && isNaN(page)) {
+                                totalPage = 1
+                            }
+                            if(page > totalPage) {
+                                reject({
+                                    success: false,
+                                    message: "Page not found",
+                                    data: []
+                                })
+                            } resolve({
+                                success: true,
+                                message: "Success get data",
+                                data: {
+                                    totalAllData: results1.length,
+                                    totalRows: results.length,
+                                    totalPage: totalPage,
+                                    results: results
+                                }
+                            }) 
+                    }
+                })
             }
-            resolve({
-                message: "get all users success",
-                status: 200,
-                data: results
-            })
+            
         })
         })
     },
@@ -32,113 +65,198 @@ module.exports = {
             if(err || results.length === 0) {
                 reject({
                     success: false,
-                    message: `email not found`,
+                    message: `user not found`,
                     data: []
                 })
             }
             else {
                 resolve({
                     success: true,
-                    message: 'get email success',
-                    data: {
-                        email: email,
-                    }
+                    message: 'get user success',
+                    data: results
                 })
             }
             })
         })
     },
+    updatePasswordByUser: (req, res) => {
+        const { userId } = req.params
+        const { password} = req.body
+        return new Promise ((resolve, reject)=> {
+            const hash = CryptoJS.AES.encrypt(password, process.env.SECRET_KEY_CRYPT).toString();
+            const sql = `SELECT userId FROM users WHERE userId = '${userId}'`
+            db.query(sql, (err, results)=> {
+                if(err) {
+                    reject({
+                        success: false,
+                        message: `Error: ${err.code}`,
+                        data: []
+                    })
+                }
+                if(results.length === 0) {
+                    reject({
+                        success: false,
+                        message: `user not found`,
+                        data: []
+                    })
+                } else {
+                    const sql = `UPDATE users SET password = '${hash}' WHERE userId = '${userId}'`
+                    db.query(sql, (err, results)=> {
+                        if(err) {
+                            reject({
+                                success: false,
+                                message: `Error: ${err.code}`,
+                                data: []
+                            })
+                        } else {
+                            resolve({
+                                success: true,
+                                message: 'update password success',
+                                data: []
+                            })
+                        }
+                    })
+                }
+            })
+        }) 
+    },
     // update user without role, dan password
     updateByUsers: (req, res) => {
         return new Promise((resolve, reject)=> {
-            const {email} = req.body
-            const sql = `UPDATE users SET email = '${email}' WHERE email = '${email}'`
-            db.query(sql,(err, results)=> {
-            if (err) {
-                reject({
-                    success: false,
-                    message: `email or password not found`,
-                    data: []
-                })
-            } else {
-                resolve({
-                    success: true,
-                    message: 'update password success',
-                    data: {
-                        password: password,
+            const { userId } = req.params
+            
+            const dbSQL = `SELECT * FROM users WHERE userId = '${userId}'`
+            db.query(dbSQL,(err, results) => {
+                if(err) {
+                    reject({
+                        success: false,
+                        message: `error: ${err.code}`,
+                        data: []
+                    })
+                } else if(results.length === 0) {
+                    reject({
+                        success: false,
+                        message: `user not found`,
+                        data: []
+                    })
+                }else{
+                    let prevData = {
+                        ...results[0],
+                        ...req.body
+                    } 
+                    if (req.body.userImage === ''){
+                        prevData = {
+                            ...prevData,
+                            image: results[0].userImage
+                        }
                     }
-                })
-            }
-        })
+                    if(results[0].userImage !== req.body.userImage) {
+                        fs.unlink(`uploads/${results[0].userImage}`), (err)=> {
+                            if(err) {
+                                reject({
+                                    success: false,
+                                    message: `error: ${err.code}`,
+                                    data: []
+                                })
+                            }
+                            prevData = {
+                                ...prevData,
+                                userImage: req.body.userImage
+                            }
+                        }
+                    }
+                    const {username,email, name, phone, job, userImage, description} = prevData
+                    const sql = `UPDATE users SET username='${username}', email = '${email}', name = '${name}', phone = '${phone}', job = '${job}', description='${description}', userImage='${userImage}' WHERE userId = '${userId}'`
+                    db.query(sql, (err) => {
+                        if (err) {
+                            reject({
+                                success: false,
+                                message: `error: ${err.code}`,
+                                data: []
+                            })
+                        } else {
+                            console.log('tetaasdsad')
+                            // resolve({
+                            //     success: true,
+                            //     message: 'update user success',
+                            //     data: []
+                            // })
+                        }
+                    })
+                }
+            })
         })
     },
+    //not fixed
     updateByAdmin: (req, res) => {
+        const { userId } = req.params
         return new Promise((resolve, reject)=> {
-            const {userId, username, name, email, phone, job, description, userImage} = req.body
             const dbSQL = `SELECT * FROM users WHERE userId = '${userId}'`
             db.query(dbSQL,(err, results)=> {
                 if(err) {
                     reject({
                         success: false,
-                        status: 500,
-                        message: `error get user`,
-                        data: {
-                            error: err
-                        }
+                        message: `error: ${err.code}`,
+                        data: []
                     })
                 } else if(results.length === 0) {
                     reject({
                         success: false,
-                        status: 400,
                         message: `Bad request, user not found`,
                     })
                 } else {
                     let prevData = {
                         ...results[0],
-                        userId: results[0].userId,
-                        userImage: results[0].userImage,
                         ...req.body
                     } 
-                    if(results[0].userImage !== req.body.userImage) {
-                    fs.unlink(`uploads/${results[0].userImage}`), (err)=> {
-                        if(err) {
-                            reject({
-                                success: false,
-                                status: 500,
-                                message: err,
-                            })
+                    if (req.body.userImage === ''){
+                        prevData = {
+                            ...prevData,
+                            image: results[0].userImage
                         }
                     }
-                    prevData = {
-                        ...prevData,
-                        userImage: req.body.userImage
+                    if(results[0].userImage !== req.body.userImage) {
+                        fs.unlink(`uploads/${results[0].userImage}`), (err)=> {
+                            if(err) {
+                                reject({
+                                    success: false,
+                                    message: `error: ${err.code}`,
+                                    data: []
+                                })
+                            }
+                            prevData = {
+                                ...prevData,
+                                userImage: req.body.userImage
+                            }
+                        }
                     }
-                }
+                    const { username, name, email, phone, job, description, userImage, isActive} = prevData
+
+
+                    const sql = `UPDATE users SET username = '${username}', name= '${name}', email = '${email}', phone = '${phone}', job = '${job}', description = '${description}', userImage = '${userImage}', isActive= '${isActive}' WHERE userId = '${userId}'`
+                    db.query(sql,(err, results)=> {
+                    if(err) {
+                        reject({
+                            success: false,
+                            message: `error: ${err.code}`,
+                            data: []
+                        })
+                    } else {
+                        resolve({
+                            success: true,
+                            message: 'update users success',
+                            data: results
+                        })
+                    }
+                    })
                 } 
-                
             })
-            const sql = `UPDATE users SET username = '${username}', name= '${name}', email = '${email}', phone = '${phone}', job = '${job}', description = '${description}', userImage = '${userImage}' WHERE email = '${email}'`
-            db.query(sql,(err, results)=> {
-            if(err) {
-                reject({
-                    success: false,
-                    message: `error updating users`,
-                    data: []
-                })
-            } else {
-                resolve({
-                    success: true,
-                    message: 'update users success',
-                    data: results
-                })
-            }
-        })
         })
     },
     deleteByAdmin: (req, res) => {
         return new Promise((resolve, reject)=> {
-            const {email} = req.query
-            const sql = `DELETE FROM users WHERE email = '${email}'`
+            const {userId} = req.params
+            const sql = `DELETE FROM users WHERE userId = '${userId}'`
             db.query(sql,(err, results)=> {
             if(err) {
                 reject({
