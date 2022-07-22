@@ -1,7 +1,7 @@
 const Users = require('../models/users')
 
 module.exports = {
-    getAllUsers: async (req, res)=> {
+    getAllUsers: async (req, res) => {
         try {
             const results = await Users.getByAdmin(req, res)
             return res.status(200).send(results)
@@ -9,7 +9,7 @@ module.exports = {
             return res.status(500).send(error)
         }
     },
-    getEmail: async (req, res)=> {
+    getEmail: async (req, res) => {
         try {
             const results = await Users.getByUsers(req, res)
             return res.status(200).send(results)
@@ -17,7 +17,7 @@ module.exports = {
             return res.status(500).send(error)
         }
     },
-    updatePassword: async (req, res)=> {
+    updatePassword: async (req, res) => {
         try {
             const results = await Users.updatePasswordByUser(req, res)
             return res.status(200).send(results)
@@ -31,12 +31,12 @@ module.exports = {
                 ...req
             }
             if (req.file) {
-                if(req.file !== null && req.file !== '') {
+                if (req.file !== null && req.file !== '') {
                     reqModified = {
                         ...req,
                         body: {
-                            ...req.body, 
-                            image: req.file.filename
+                            ...req.body,
+                            userImage: req.file.filename
                         }
                     }
                 }
@@ -45,31 +45,31 @@ module.exports = {
             return res.status(200).send(results)
         } catch (error) {
             return res.status(500).send(error)
-        } 
+        }
     },
-    updateAdmin: async (req, res)=> {
+    updateAdmin: async (req, res) => {
         try {
-            let requireModified = {
+            let reqModified = {
                 ...req
             }
             if (req.file) {
-                if(req.file !== null && req.file !== '') {
-                    requireModified = {
+                if (req.file !== null && req.file !== '') {
+                    reqModified = {
                         ...req,
                         body: {
-                            ...req.body, 
-                            image: req.file.filename
+                            ...req.body,
+                            userImage: req.file.filename
                         }
                     }
                 }
             }
-            const results = await Users.updateByAdmin(req, res)
+            const results = await Users.updateByAdmin(reqModified, res)
             return res.status(200).send(results)
         } catch (error) {
             return res.status(500).send(error)
         }
     },
-    deleteUser: async (req, res)=> {
+    deleteUser: async (req, res) => {
         try {
             const results = await Users.deleteByAdmin(req, res)
             return res.status(200).send(results)
