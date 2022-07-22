@@ -124,7 +124,6 @@ module.exports = {
     updateByUsers: (req, res) => {
         return new Promise((resolve, reject) => {
             const { userId } = req.params
-
             const dbSQL = `SELECT * FROM users WHERE userId = '${userId}'`
             db.query(dbSQL, (err, results) => {
                 if (err) {
@@ -247,19 +246,45 @@ module.exports = {
     deleteByAdmin: (req, res) => {
         return new Promise((resolve, reject) => {
             const { userId } = req.params
-            const sql = `DELETE FROM users WHERE userId = '${userId}'`
-            db.query(sql, (err, results) => {
+            const dbSQL = `SELECT userId, userImage FROM users WHERE userId = '${userId}'`
+            db.query(dbSQL, (err, results) => {
                 if (err) {
                     reject({
                         success: false,
-                        message: `error deleting users`,
+                        message: `error: ${err.code}`,
                         data: []
                     })
+                } else if (results.length === 0) {
+                    reject({
+                        success: false,
+                        message: `user not found`,
+                    })
                 } else {
-                    resolve({
-                        success: true,
-                        message: 'delete users success',
-                        data: results
+                    const imagetmp = results[0].userImage
+                    const sql = `DELETE FROM users WHERE userId = '${userId}'`
+                    db.query(sql, (err, results) => {
+                        if(err) {
+                            reject({
+                                success: false,
+                                message: `error: ${err.code}`,
+                                data: []
+                            })
+                        } else {
+                            fs.unlink(`uploads/${imagetmp}`, (err, results) => {
+                                if(err) {
+                                    reject({
+                                        success: false,
+                                        message: `error: ${err.code}`,
+                                        data: []
+                                    })
+                                }
+                                resolve({
+                                    success: true,
+                                    message: 'delete user success',
+                                    data: results
+                                })
+                            })
+                        }
                     })
                 }
             })
