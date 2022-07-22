@@ -21,5 +21,11 @@ module.exports = {
       return res.status(403).json({ success: false, message: 'Access Forbidden, Only admin can do this feature!' })
     }
     next()
-  }
+  },
+  isWriter: (req, res, next) => {
+    if (req.decodeToken.role !== 'writer') {
+      return res.status(403).json({ success: false, message: 'Access Forbidden' })
+    }
+    next()
+  },
 }
