@@ -1,10 +1,9 @@
 const axios = require('axios')
-// const templateEmail = import('./templateSendEmail.html')
 
 module.exports = {
-  SendEmail: (email, code) => {
+  ForgotPass: (email, code) => {
     return new Promise((resolve, reject) => {
-      const url = `http://localhost:3000/api/v1/auth/verify?email=${email}&code=${code}`
+      const url = `http://localhost:3000/api/v1/auth/forgot-pass?email=${email}&code=${code}`
       axios({
         method: 'POST',
         url: 'https://api.sendinblue.com/v3/smtp/email',
@@ -22,9 +21,8 @@ module.exports = {
               "email": `${email}`,
             }
           ],
-          "subject": "Verify your account!",
-          "htmlContent": `
-          <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+          "subject": "Reset your password!",
+          "htmlContent": `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
           <html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml"
             xmlns:o="urn:schemas-microsoft-com:office:office">
           
@@ -107,14 +105,14 @@ module.exports = {
             <style type="text/css" emogrify="no">
               @media (max-width: 600px) {
                 .gmx-killpill {
-                  content: "03D1";
+                  content: " 03D1";
                 }
               }
             </style>
             <style type="text/css" emogrify="no">
               @media (max-width: 600px) {
                 .gmx-killpill {
-                  content: "03D1";
+                  content: " 03D1";
                 }
           
                 .r0-c {
@@ -546,7 +544,6 @@ module.exports = {
                                                             ­
                                                           </td>
                                                         </tr>
-          
                                                         <tr>
                                                           <td align="left" valign="top" class="r14-i nl2go-default-textstyle"
                                                             style="
@@ -583,30 +580,6 @@ module.exports = {
                                                     </td>
                                                   </tr>
                                                   <tr>
-                                                    <td align="left" valign="top" class="r14-i nl2go-default-textstyle" style="
-                                                          color: #3b3f44;
-                                                          font-family: arial,
-                                                            helvetica, sans-serif;
-                                                          font-size: 16px;
-                                                          line-height: 1.5;
-                                                          text-align: left;
-                                                        ">
-                                                      <div>
-                                                        <h4 class="default-heading2" style="
-                                                              margin: 0;
-                                                              color: #1f2d3d;
-                                                              font-family: arial,
-                                                                helvetica,
-                                                                sans-serif;
-                                                              font-size: 26px;
-                                                              text-align: center;
-                                                            ">
-                                                          Welcome ${email}!
-                                                        </h4>
-                                                      </div>
-                                                    </td>
-                                                  </tr>
-                                                  <tr>
                                                     <td class=" r12-c" align="left">
                                                       <table cellspacing="0" cellpadding="0" border="0" role="presentation"
                                                         width="100%" class="r13-o" style="
@@ -633,9 +606,7 @@ module.exports = {
                                                               ">
                                                             <div>
                                                               <p style="margin: 0">
-                                                                Thank you for joining Daily News, your account registration has
-                                                                been successful, please click the button below to verify your
-                                                                account.
+                                                                Please click the button below to reset your password.
                                                               </p>
                                                             </div>
                                                           </td>
@@ -701,7 +672,7 @@ module.exports = {
                                                                   width: 280px;
                                                                 ">
                                                               <p style="margin: 0">
-                                                                Verify account
+                                                                Reset password
                                                               </p>
                                                             </a>
                                                             <!--<![endif]-->
@@ -1116,8 +1087,7 @@ module.exports = {
                                                                     font-size: 14px;
                                                                   ">
                                                                 You've received this
-                                                                email because you've
-                                                                register to our website.
+                                                                email because you're want to recover your password.
                                                               </p>
                                                             </div>
                                                           </td>
@@ -1160,6 +1130,7 @@ module.exports = {
           </body>
           
           </html>`
+
         })
       })
         .then(result => resolve(true))
