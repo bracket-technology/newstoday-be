@@ -3,6 +3,7 @@ const crypto = require("crypto-js")
 const CryptoJS = require("crypto-js");
 const Auth = require('../models/auth')
 const { SendEmail } = require('../helpers/sendEmail');
+const { ForgotPass } = require('../helpers/forgotPass')
 
 randomString = (length) => {
   let result = ''
@@ -18,6 +19,7 @@ module.exports = {
     try {
       let { email, password, phone, role, username, code } = req.body
       code = randomString(20)
+      email = email.toLowerCase()
       const userImage = 'https://divedigital.id/wp-content/uploads/2021/10/1-min.png'
       if (role) {
         return res.status(404).json({ success: false, message: "Can't input role" })
@@ -28,6 +30,8 @@ module.exports = {
       if (password.length < 8) {
         return res.status(404).json({ success: false, message: "Password must be more than 8 characters" })
       }
+      const hash = CryptoJS.AES.encrypt(password, process.env.SECRET_KEY_CRYPT).toString()
+      password = hash
       const sendemail = await SendEmail(email, code)
       if (sendemail) {
         const result = await Auth.register(email, phone, password, code, userImage)
@@ -38,29 +42,30 @@ module.exports = {
       }
 
     } catch (error) {
-      return res.status(500).json(error.message)
+      return res.status(500).json({ success: false, message: error.message })
     }
   },
   verify: async (req, res) => {
     try {
-      const { email, code } = req.query
+      let { email, code } = req.query
+      email = email.toLowerCase()
       const checkEmail = await Auth.getUserByEmail(email)
       if (checkEmail.length == 0) {
         return res.status(404).json({ success: false, message: 'Email not found' })
       }
-      // console.log(code)
       if (checkEmail[0].code != code) {
         return res.status(400).json({ success: false, message: 'Wrong activation url!' })
       }
       const result = await Auth.verify(email)
-      return res.status(200).json({ data: result })
+      return res.status(200).json({ success: true, message: 'Successfully verified!' })
     } catch (error) {
-      return res.status(500).json(error.message)
+      return res.status(500).json({ success: false, message: error.message })
     }
   },
   login: async (req, res) => {
     try {
-      const { email, password } = req.body
+      let { email, password } = req.body
+      email = email.toLowerCase()
       if (!email || !password) {
         return res.status(404).json({ success: false, message: "Fields must be filled" })
       }
@@ -68,7 +73,9 @@ module.exports = {
       if (result.length < 1) {
         return res.status(404).json({ success: false, message: 'Wrong Email / Password' })
       }
-      // console.log(result)
+      if (password < 8) {
+        return res.status(404).json({ success: false, message: 'Password must be more than 8 characters' })
+      }
       const hash = CryptoJS.AES.decrypt(result[0].password, process.env.SECRET_KEY_CRYPT).toString(CryptoJS.enc.Utf8)
       if (password !== hash) {
         return res.status(404).json({ success: false, message: 'Wrong Email / Password' })
@@ -87,8 +94,49 @@ module.exports = {
         }
       })
     } catch (error) {
-      return res.status(500).json(error.message)
+      return res.status(500).json({ success: false, message: error.message })
     }
   },
-
+  forgotPass: async (req, res) => {
+    try {
+      let { email, code } = req.query
+      email = email.toLowerCase()
+      code = randomString(20)
+      const checkEmail = await Auth.getUserByEmail(email)
+      if (checkEmail.length < 1) {
+        return res.status(404).json({ success: false, message: 'Email not found' })
+      }
+      const sendemail = await ForgotPass(email, code)
+      if (sendemail) {
+        const result = await Auth.forgotPass(email, code)
+        return res.status(201).json({ success: true, message: 'Successfully sent forgot-password!, Please check your email !' })
+      }
+      return res.status(200).json({ data: result })
+    } catch (error) {
+      return res.status(500).json({ success: false, message: error.message })
+    }
+  },
+  changePassword: async (req, res) => {
+    try {
+      const { email } = req.query
+      const checkEmail = await Auth.getUserByEmail(email)
+      if (checkEmail.length < 1) {
+        return res.status(404).json({
+          success: false, message: 'User not found!'
+        })
+      }
+      let { newPassword, confrimPassword } = req.body
+      if (newPassword.length < 8) {
+        return res.status(404).json({ success: false, message: 'Password must be more than 8 characters' })
+      }
+      if (newPassword !== confrimPassword) {
+        return res.status(400).json({ success: false, message: 'New Password and Confrim Password must be same' })
+      }
+      const password = CryptoJS.AES.encrypt(newPassword, process.env.SECRET_KEY_CRYPT).toString();
+      const result = await Auth.updatePassword(email, password)
+      return res.status(200).json({ success: true, message: 'Successfully change password!' })
+    } catch (error) {
+      return res.status(500).json({ success: false, message: error.message })
+    }
+  },
 }
