@@ -9,9 +9,9 @@ module.exports = {
         const page = parseInt(req.query.page)
         const limit = parseInt(req.query.limit)
         const offset = (page - 1) * limit
-        return new Promise ((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             const sql = `SELECT * FROM category ${categoryId ? `WHERE categoryId LIKE '%${categoryId}%'` : search ? `WHERE categoryName LIKE '%${search}%' OR categoryImage LIKE '%${search}%' ` : orderBy ? `ORDER BY categoryId ${orderBy}` : ''} ${page && limit ? `LIMIT ${limit} OFFSET ${offset}` : ''}`
-            db.query(sql, (err, results)=> {
+            db.query(sql, (err, results) => {
                 if (err) {
                     reject({
                         success: false,
@@ -58,9 +58,9 @@ module.exports = {
     },
     getById: (req, res) => {
         const { categoryId } = req.params
-        return new Promise ((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             const sql = `SELECT * FROM category WHERE categoryId = '${categoryId}'`
-            db.query(sql, (err, results)=> {
+            db.query(sql, (err, results) => {
                 if (err) {
                     reject({
                         success: false,
@@ -79,7 +79,7 @@ module.exports = {
     }
     ,
     add: (req, res) => {
-        return new Promise ((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             const { categoryName, categoryImage } = req.body
             const sql = `INSERT INTO category (categoryName, categoryImage) VALUES ('${categoryName}', '${categoryImage}')`
             db.query(sql, (err, results) => {
@@ -100,71 +100,71 @@ module.exports = {
         })
     },
     update: (req, res) => {
-        
-            const { categoryId } = req.params
-            return new Promise ((resolve, reject) => {
-                const dbSQL = `SELECT * FROM category WHERE categoryId = '${categoryId}'`
-                db.query(dbSQL, (err, results) => {
-                    if (err) {
-                        reject({
-                            success: false,
-                            message: `Error: ${err.code}`,
-                            data: []
-                        })
-                    } else if (results.length === 0) {
-                        reject({
-                            success: false,
-                            message: "Data not found",
-                            data: []
-                        })
-                    } else {
-                        
-                        let prevData = {
-                            ...results[0],
-                            ...req.body,
-                            categoryImage: results[0].categoryImage
-                        }
-                        if (req.body.categoryImage) {
-                            if (results[0].categoryImage !== req.body.categoryImage) {
-                                fs.unlink(`uploads/category/${results[0].categoryImage}`), (err) => {
-                                    if(err) {
-                                        reject({
-                                            success: false,
-                                            message: `Error: ${err.code}`,
-                                            data: []
-                                        })
-                                    } 
-                                }
-                                prevData = {
-                                    ...prevData,
-                                    userImage: req.file.filename
-                                }
-                            }
-                            const { categoryName, categoryImage } = prevData
-                            const sql = `UPDATE category SET categoryName = '${categoryName}', categoryImage = '${categoryImage}' WHERE categoryId = '${categoryId}'`
-                            db.query(sql, (err, results) => {
+        const { categoryId } = req.params
+        return new Promise((resolve, reject) => {
+            const dbSQL = `SELECT * FROM category WHERE categoryId = '${categoryId}'`
+            db.query(dbSQL, (err, results) => {
+                if (err) {
+                    reject({
+                        success: false,
+                        message: `Error: ${err.code}`,
+                        data: []
+                    })
+                }
+                if (results.length === 0) {
+                    reject({
+                        success: false,
+                        message: "Data not found",
+                        data: []
+                    })
+                } else {
+
+                    let prevData = {
+                        ...results[0],
+                        ...req.body,
+                        categoryImage: results[0].categoryImage
+                    }
+                    if (req.body.categoryImage) {
+                        if (results[0].categoryImage !== req.body.categoryImage) {
+                            fs.unlink(`uploads/category/${results[0].categoryImage}`, (err) => {
                                 if (err) {
                                     reject({
                                         success: false,
                                         message: `Error: ${err.code}`,
                                         data: []
                                     })
-                                } else {
-                                    resolve({
-                                        success: true,
-                                        message: "Success update data",
-                                        data: results
-                                    })
                                 }
                             })
+                            prevData = {
+                                ...prevData,
+                                categoryImage: req.file.filename
+                            }
                         }
                     }
-                })
+                    const { categoryName, categoryImage } = prevData
+                    const sql = `UPDATE category SET categoryName = '${categoryName}', categoryImage = '${categoryImage}' WHERE categoryId = '${categoryId}'`
+                    db.query(sql, (err, results) => {
+                        if (err) {
+                            reject({
+                                success: false,
+                                message: `Error: ${err.code}`,
+                                data: []
+                            })
+                        }
+                        resolve({
+                            success: true,
+                            message: "Success update data",
+                            data: results
+                        })
+
+                    })
+                }
             })
-        
+        })
+
     },
     remove: (req, res) => {
-        return new Promise ((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             const { categoryId } = req.params
             const dbSQL = `SELECT categoryId, categoryImage FROM category WHERE categoryId = '${categoryId}'`
             db.query(dbSQL, (err, results) => {
@@ -174,24 +174,25 @@ module.exports = {
                         message: `error: ${err.code}`,
                         data: []
                     })
-                } else if (results.length === 0) {
+                }
+                if (results.length === 0) {
                     reject({
                         success: false,
                         message: `category not found`,
                     })
                 } else {
                     const imagetmp = results[0].categoryImage
-                    const sql = `DELETE FROM category WHERE userId = '${categoryId}'`
+                    const sql = `DELETE FROM category WHERE categoryId = '${categoryId}'`
                     db.query(sql, (err, results) => {
-                        if(err) {
+                        if (err) {
                             reject({
                                 success: false,
                                 message: `error: ${err.code}`,
                                 data: []
                             })
                         } else {
-                            fs.unlink(`uploads/category/${imagetmp}`, (err, results) => {
-                                if(err) {
+                            fs.unlink(`uploads/category/${imagetmp}`, (err) => {
+                                if (err) {
                                     reject({
                                         success: false,
                                         message: `error: ${err.code}`,
@@ -201,7 +202,7 @@ module.exports = {
                                 resolve({
                                     success: true,
                                     message: 'delete user success',
-                                    data: results
+                                    data: []
                                 })
                             })
                         }

@@ -263,15 +263,15 @@ module.exports = {
                     const imagetmp = results[0].userImage
                     const sql = `DELETE FROM users WHERE userId = '${userId}'`
                     db.query(sql, (err, results) => {
-                        if(err) {
+                        if (err) {
                             reject({
                                 success: false,
                                 message: `error: ${err.code}`,
                                 data: []
                             })
                         } else {
-                            fs.unlink(`uploads/${imagetmp}`, (err, results) => {
-                                if(err) {
+                            fs.unlink(`uploads/${imagetmp}`, (err) => {
+                                if (err) {
                                     reject({
                                         success: false,
                                         message: `error: ${err.code}`,
@@ -281,7 +281,7 @@ module.exports = {
                                 resolve({
                                     success: true,
                                     message: 'delete user success',
-                                    data: results
+                                    data: []
                                 })
                             })
                         }

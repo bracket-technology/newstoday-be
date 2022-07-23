@@ -86,10 +86,9 @@ module.exports = {
       return res.status(200).json({
         success: true,
         message: 'Success login', data: {
-          user_id: result[0].userId,
+          userId: result[0].userId,
           token,
           photo: result[0].userImage,
-          role: result[0].role,
           email: result[0].email
         }
       })
@@ -118,12 +117,15 @@ module.exports = {
   },
   changePassword: async (req, res) => {
     try {
-      const { email } = req.query
+      const { email, code } = req.query
       const checkEmail = await Auth.getUserByEmail(email)
       if (checkEmail.length < 1) {
         return res.status(404).json({
           success: false, message: 'User not found!'
         })
+      }
+      if (checkEmail[0].code != code) {
+        return res.status(400).json({ success: false, message: 'Wrong activation url!' })
       }
       let { newPassword, confrimPassword } = req.body
       if (newPassword.length < 8) {
@@ -133,10 +135,36 @@ module.exports = {
         return res.status(400).json({ success: false, message: 'New Password and Confrim Password must be same' })
       }
       const password = CryptoJS.AES.encrypt(newPassword, process.env.SECRET_KEY_CRYPT).toString();
-      const result = await Auth.updatePassword(email, password)
+      await Auth.updatePassword(email, password)
+      await Auth.verify(email)
       return res.status(200).json({ success: true, message: 'Successfully change password!' })
     } catch (error) {
       return res.status(500).json({ success: false, message: error.message })
     }
   },
+  verifyCode: async (req, res) => {
+    try {
+      const { email, code } = req.query
+      const checkEmail = await Auth.getUserByEmail(email)
+      if (checkEmail.length < 1) {
+        return res.status(404).json({ success: false, message: 'Email not found' })
+      }
+      if (checkEmail[0].code != code) {
+        return res.status(400).json({ success: false, message: 'Wrong activation url!' })
+      }
+      return res.status(200).json({ success: true, message: 'Successfully verified!' })
+    } catch (error) {
+      return res.status(500).json({ success: false, message: error.message })
+    }
+  }
+  ,
+  verifyToken: async (req, res) => {
+    try {
+      const token = req.headers.authorization.split(' ')[1]
+      const decoded = jwt.verify(token, process.env.SECRET_KEY_JWT)
+      return res.status(200).json({ success: true, message: 'Successfully verified!', data: decoded })
+    } catch (error) {
+      return res.status(500).json({ success: false, message: error.message })
+    }
+  }
 }

@@ -53,7 +53,7 @@ module.exports = {
     },
     deleteCategory: async (req, res) => {
         try {
-            const results = await Category.delete(req, res)
+            const results = await Category.remove(req, res)
             return res.status(200).send(results)
         } catch (error) {
             return res.status(500).send(error)

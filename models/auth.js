@@ -80,7 +80,7 @@ module.exports = {
   },
   updatePassword: (email, password) => {
     return new Promise((resolve, reject) => {
-      const dbQuery = db.query(`UPDATE users SET password = '${password}' WHERE email = '${email}'`, (error, result) => {
+      const dbQuery = db.query(`UPDATE users SET password = '${password}',code = '' WHERE email = '${email}'`, (error, result) => {
         if (error) {
           reject({
             success: false,
@@ -91,5 +91,5 @@ module.exports = {
       })
       // console.log(dbQuery.sql)
     })
-  },
+  }
 }
