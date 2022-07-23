@@ -22,13 +22,13 @@ module.exports = {
       email = email.toLowerCase()
       const userImage = 'https://divedigital.id/wp-content/uploads/2021/10/1-min.png'
       if (role) {
-        return res.status(404).json({ success: false, message: "Can't input role" })
+        return res.status(404).json({ success: false, message: "Error: Can't input role" })
       }
       if (!email || !password || !phone) {
-        return res.status(404).json({ success: false, message: "Fields must be filled" })
+        return res.status(404).json({ success: false, message: "Error: Fields must be filled" })
       }
       if (password.length < 8) {
-        return res.status(404).json({ success: false, message: "Password must be more than 8 characters" })
+        return res.status(404).json({ success: false, message: "Error: Password must be more than 8 characters" })
       }
       const hash = CryptoJS.AES.encrypt(password, process.env.SECRET_KEY_CRYPT).toString()
       password = hash
@@ -42,7 +42,7 @@ module.exports = {
       }
 
     } catch (error) {
-      return res.status(500).json({ success: false, message: error.message })
+      return res.status(500).json({ success: false, message: `Error: ${error.code}` })
     }
   },
   verify: async (req, res) => {
@@ -51,7 +51,7 @@ module.exports = {
       email = email.toLowerCase()
       const checkEmail = await Auth.getUserByEmail(email)
       if (checkEmail.length == 0) {
-        return res.status(404).json({ success: false, message: 'Email not found' })
+        return res.status(404).json({ success: false, message: 'Error: Email not found' })
       }
       if (checkEmail[0].code != code) {
         return res.status(400).json({ success: false, message: 'Wrong activation url!' })
@@ -59,7 +59,7 @@ module.exports = {
       const result = await Auth.verify(email)
       return res.status(200).json({ success: true, message: 'Successfully verified!' })
     } catch (error) {
-      return res.status(500).json({ success: false, message: error.message })
+      return res.status(500).json({ success: false, message: `Error: ${error.code}` })
     }
   },
   login: async (req, res) => {
@@ -67,20 +67,20 @@ module.exports = {
       let { email, password } = req.body
       email = email.toLowerCase()
       if (!email || !password) {
-        return res.status(404).json({ success: false, message: "Fields must be filled" })
+        return res.status(404).json({ success: false, message: "Error: Fields must be filled" })
       }
       const result = await Auth.login(email, password)
       if (result.length < 1) {
-        return res.status(404).json({ success: false, message: 'Wrong Email / Password' })
+        return res.status(404).json({ success: false, message: 'Error: Wrong Email / Password' })
       }
       if (password < 8) {
-        return res.status(404).json({ success: false, message: 'Password must be more than 8 characters' })
+        return res.status(404).json({ success: false, message: 'Error: Password must be more than 8 characters' })
       }
       const hash = CryptoJS.AES.decrypt(result[0].password, process.env.SECRET_KEY_CRYPT).toString(CryptoJS.enc.Utf8)
       if (password !== hash) {
-        return res.status(404).json({ success: false, message: 'Wrong Email / Password' })
+        return res.status(404).json({ success: false, message: 'Error: Wrong Email / Password' })
       }
-      const token = jwt.sign({ user_id: result[0].userId, role: result[0].role, email: result[0].email }, process.env.SECRET_KEY_JWT, {
+      const token = jwt.sign({ userId: result[0].userId, role: result[0].role, email: result[0].email }, process.env.SECRET_KEY_JWT, {
         expiresIn: '1 day'
       })
       return res.status(200).json({
@@ -94,7 +94,7 @@ module.exports = {
         }
       })
     } catch (error) {
-      return res.status(500).json({ success: false, message: error.message })
+      return res.status(500).json({ success: false, message: `Error: ${error.code}` })
     }
   },
   forgotPass: async (req, res) => {
@@ -104,7 +104,7 @@ module.exports = {
       code = randomString(20)
       const checkEmail = await Auth.getUserByEmail(email)
       if (checkEmail.length < 1) {
-        return res.status(404).json({ success: false, message: 'Email not found' })
+        return res.status(404).json({ success: false, message: 'Error: Email not found' })
       }
       const sendemail = await ForgotPass(email, code)
       if (sendemail) {
@@ -113,7 +113,7 @@ module.exports = {
       }
       return res.status(200).json({ data: result })
     } catch (error) {
-      return res.status(500).json({ success: false, message: error.message })
+      return res.status(500).json({ success: false, message: `Error: ${error.code}` })
     }
   },
   changePassword: async (req, res) => {
@@ -122,21 +122,21 @@ module.exports = {
       const checkEmail = await Auth.getUserByEmail(email)
       if (checkEmail.length < 1) {
         return res.status(404).json({
-          success: false, message: 'User not found!'
+          success: false, message: 'Error: User not found!'
         })
       }
       let { newPassword, confrimPassword } = req.body
       if (newPassword.length < 8) {
-        return res.status(404).json({ success: false, message: 'Password must be more than 8 characters' })
+        return res.status(404).json({ success: false, message: 'Error: Password must be more than 8 characters' })
       }
       if (newPassword !== confrimPassword) {
-        return res.status(400).json({ success: false, message: 'New Password and Confrim Password must be same' })
+        return res.status(400).json({ success: false, message: 'Error: New Password and Confrim Password must be same' })
       }
       const password = CryptoJS.AES.encrypt(newPassword, process.env.SECRET_KEY_CRYPT).toString();
       const result = await Auth.updatePassword(email, password)
       return res.status(200).json({ success: true, message: 'Successfully change password!' })
     } catch (error) {
-      return res.status(500).json({ success: false, message: error.message })
+      return res.status(500).json({ success: false, message: `Error: ${error.code}` })
     }
   },
 }
