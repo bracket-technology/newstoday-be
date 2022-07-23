@@ -564,14 +564,14 @@ module.exports = {
                                                                     font-size: 32px;
                                                                     text-align: center;
                                                                   ">
-                                                                Daily <span class="default-heading2" style="
+                                                                News <span class="default-heading2" style="
                                                                 margin: 0;
                                                                 color: #edc046;
                                                                 font-family: arial,
                                                                   helvetica,
                                                                   sans-serif;
                                                                 font-size: 32px;
-                                                                text-align: center;">News</span>
+                                                                text-align: center;">Today</span>
                                                               </h2>
                                                             </div>
                                                           </td>

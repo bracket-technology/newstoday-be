@@ -4,7 +4,7 @@ const axios = require('axios')
 module.exports = {
   SendEmail: (email, code) => {
     return new Promise((resolve, reject) => {
-      const url = `http://localhost:3000/api/v1/auth/verify?email=${email}&code=${code}`
+      const url = `${process.env.LINK_VERIFY}?email=${email}&code=${code}`
       axios({
         method: 'POST',
         url: 'https://api.sendinblue.com/v3/smtp/email',
@@ -567,14 +567,14 @@ module.exports = {
                                                                     font-size: 32px;
                                                                     text-align: center;
                                                                   ">
-                                                                Daily <span class="default-heading2" style="
+                                                                News <span class="default-heading2" style="
                                                                 margin: 0;
                                                                 color: #edc046;
                                                                 font-family: arial,
                                                                   helvetica,
                                                                   sans-serif;
                                                                 font-size: 32px;
-                                                                text-align: center;">News</span>
+                                                                text-align: center;">Today</span>
                                                               </h2>
                                                             </div>
                                                           </td>
