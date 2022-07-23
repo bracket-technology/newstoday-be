@@ -29,7 +29,7 @@ app.use(expressWinston.logger({
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 app.use('/api/v1', router)
 
-
+app.get('/', (req, res) => res.send('Services working perfectly.'))
 
 app.listen(port, () => {
   console.log(`Backend listening on port ${port}`)
