@@ -182,7 +182,6 @@ module.exports = {
             })
         })
     },
-    //not fixed
     updateByAdmin: (req, res) => {
         const { userId } = req.params
         return new Promise((resolve, reject) => {

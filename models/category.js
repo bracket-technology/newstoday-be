@@ -56,7 +56,6 @@ module.exports = {
             })
         })
     },
-    //not fixed
     getById: (req, res) => {
         const { categoryId } = req.params
         return new Promise((resolve, reject) => {
