@@ -112,7 +112,7 @@ module.exports = {
                             resolve({
                                 success: true,
                                 message: 'update password success',
-                                data: []
+                                data: results
                             })
                         }
                     })
@@ -163,7 +163,7 @@ module.exports = {
                     }
                     const { username, email, name, phone, job, userImage, description } = prevData
                     const sql = `UPDATE users SET username='${username}', email = '${email}', name = '${name}', phone = '${phone}', job = '${job}', description='${description}', userImage='${userImage}' WHERE userId = '${userId}'`
-                    db.query(sql, (error, res) => {
+                    db.query(sql, (error, results) => {
                         if (error) {
                             reject({
                                 success: false,
@@ -174,7 +174,7 @@ module.exports = {
                         resolve({
                             success: true,
                             message: 'update user success',
-                            data: []
+                            data: results
                         })
 
                     })
@@ -281,7 +281,7 @@ module.exports = {
                                 resolve({
                                     success: true,
                                     message: 'delete user success',
-                                    data: []
+                                    data: results
                                 })
                             })
                         }

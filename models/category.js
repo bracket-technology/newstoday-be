@@ -56,6 +56,7 @@ module.exports = {
             })
         })
     },
+    //not fixed
     getById: (req, res) => {
         const { categoryId } = req.params
         return new Promise((resolve, reject) => {
@@ -65,6 +66,12 @@ module.exports = {
                     reject({
                         success: false,
                         message: `Error: ${err.code}`,
+                        data: []
+                    })
+                } else if (results.length === 0) {
+                    reject({
+                        success: false,
+                        message: "Data not found",
                         data: []
                     })
                 } else {
@@ -202,7 +209,7 @@ module.exports = {
                                 resolve({
                                     success: true,
                                     message: 'delete user success',
-                                    data: []
+                                    data: results
                                 })
                             })
                         }
