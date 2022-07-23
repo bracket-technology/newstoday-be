@@ -3,7 +3,7 @@ const axios = require('axios')
 module.exports = {
   ForgotPass: (email, code) => {
     return new Promise((resolve, reject) => {
-      const url = `http://localhost:3000/api/v1/auth/forgot-pass?email=${email}&code=${code}`
+      const url = `${process.env.LINK_FORGOT_PASS}?email=${email}&code=${code}`
       axios({
         method: 'POST',
         url: 'https://api.sendinblue.com/v3/smtp/email',
