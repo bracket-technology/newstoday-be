@@ -28,4 +28,11 @@ module.exports = {
     }
     next()
   },
+  userNotAllow: (req, res, next) => {
+    if (req.decodeToken.role !== 'admin' && req.decodeToken.role !== 'writer') {
+      return res.status(403).json({ success: false, message: 'Access Forbidden' })
+    }
+    next()
+  },
+
 }

@@ -112,7 +112,7 @@ module.exports = {
                             resolve({
                                 success: true,
                                 message: 'update password success',
-                                data: []
+                                data: results
                             })
                         }
                     })
@@ -148,11 +148,10 @@ module.exports = {
                         if (results[0].userImage !== req.body.userImage) {
                             fs.unlink(`uploads/${results[0].userImage}`, (err) => {
                                 if (err) {
-                                    reject({
-                                        success: false,
-                                        message: `error: ${err.code}`,
-                                        data: []
-                                    })
+                                    prevData = {
+                                        ...prevData,
+                                        userImage: req.file.filename
+                                    }
                                 }
                             })
                             prevData = {
@@ -163,7 +162,7 @@ module.exports = {
                     }
                     const { username, email, name, phone, job, userImage, description } = prevData
                     const sql = `UPDATE users SET username='${username}', email = '${email}', name = '${name}', phone = '${phone}', job = '${job}', description='${description}', userImage='${userImage}' WHERE userId = '${userId}'`
-                    db.query(sql, (error, res) => {
+                    db.query(sql, (error, results) => {
                         if (error) {
                             reject({
                                 success: false,
@@ -174,7 +173,7 @@ module.exports = {
                         resolve({
                             success: true,
                             message: 'update user success',
-                            data: []
+                            data: results
                         })
 
                     })
@@ -182,7 +181,6 @@ module.exports = {
             })
         })
     },
-    //not fixed
     updateByAdmin: (req, res) => {
         const { userId } = req.params
         return new Promise((resolve, reject) => {
@@ -209,11 +207,10 @@ module.exports = {
                         if (results[0].userImage !== req.body.userImage) {
                             fs.unlink(`uploads/${results[0].userImage}`, (err) => {
                                 if (err) {
-                                    reject({
-                                        success: false,
-                                        message: `error: ${err.code}`,
-                                        data: []
-                                    })
+                                    prevData = {
+                                        ...prevData,
+                                        userImage: req.file.filename
+                                    }
                                 }
                             })
                             prevData = {
@@ -263,20 +260,19 @@ module.exports = {
                     const imagetmp = results[0].userImage
                     const sql = `DELETE FROM users WHERE userId = '${userId}'`
                     db.query(sql, (err, results) => {
-                        if(err) {
+                        if (err) {
                             reject({
                                 success: false,
                                 message: `error: ${err.code}`,
                                 data: []
                             })
                         } else {
-                            fs.unlink(`uploads/${imagetmp}`, (err, results) => {
-                                if(err) {
-                                    reject({
-                                        success: false,
-                                        message: `error: ${err.code}`,
-                                        data: []
-                                    })
+                            fs.unlink(`uploads/${imagetmp}`, (err) => {
+                                if (err) {
+                                    prevData = {
+                                        ...prevData,
+                                        userImage: req.file.filename
+                                    }
                                 }
                                 resolve({
                                     success: true,
