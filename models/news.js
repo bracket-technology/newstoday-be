@@ -5,7 +5,7 @@ const fs = require('fs')
 module.exports = {
   getNewsById: (newsId) => {
     return new Promise((resolve, reject) => {
-      db.query(`SELECT n.userId, u.name,c.categoryName,n.title,n.content,n.newsImage,n.created_at FROM news n JOIN users u ON n.userId=u.userId JOIN category c ON n.categoryId=c.categoryId WHERE n.newsId=?`, newsId, (err, result) => {
+      db.query(`SELECT n.userId, u.name,u.userImage,c.categoryName,n.title,n.content,n.newsImage,n.created_at FROM news n JOIN users u ON n.userId=u.userId JOIN category c ON n.categoryId=c.categoryId WHERE n.newsId=?`, newsId, (err, result) => {
         if (err) {
           reject({
             success: false, message: err.sqlMessage, data: {
@@ -19,7 +19,7 @@ module.exports = {
   },
   getNewsByCategory: (orderBy, limit, offset, categoryId) => {
     return new Promise((resolve, reject) => {
-      const dbQuery = db.query(`SELECT n.userId, u.name,c.categoryName,n.title,n.content,n.newsImage,n.created_at FROM news n JOIN users u ON n.userId=u.userId JOIN category c ON n.categoryId=c.categoryId WHERE n.categoryId=? ORDER BY title ${orderBy} LIMIT ${limit} OFFSET ${offset}`, categoryId, (err, result) => {
+      const dbQuery = db.query(`SELECT n.userId, u.name,u.userImage,c.categoryName,n.title,n.content,n.newsImage,n.created_at FROM news n JOIN users u ON n.userId=u.userId JOIN category c ON n.categoryId=c.categoryId WHERE n.categoryId=? ORDER BY title ${orderBy} LIMIT ${limit} OFFSET ${offset}`, categoryId, (err, result) => {
         if (err) {
           reject({
             success: false, message: err.sqlMessage, data: {
@@ -61,7 +61,7 @@ module.exports = {
   },
   getAllNews: (search, orderBy, limit, offset) => {
     return new Promise((resolve, reject) => {
-      db.query(`SELECT n.newsId,u.name,c.categoryName,n.title,n.content,n.newsImage,n.created_at FROM news n JOIN users u ON n.userId=u.userId JOIN category c ON n.categoryId=c.categoryId WHERE title LIKE '%${search}%' ORDER BY title ${orderBy} LIMIT ${limit} OFFSET ${offset}`, (err, result) => {
+      db.query(`SELECT n.newsId,u.name,u.userImage,c.categoryName,n.title,n.content,n.newsImage,n.created_at FROM news n JOIN users u ON n.userId=u.userId JOIN category c ON n.categoryId=c.categoryId WHERE title LIKE '%${search}%' ORDER BY title ${orderBy} LIMIT ${limit} OFFSET ${offset}`, (err, result) => {
         if (err) {
           reject({
             success: false, message: err.sqlMessage, data: {
