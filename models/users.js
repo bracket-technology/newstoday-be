@@ -148,11 +148,10 @@ module.exports = {
                         if (results[0].userImage !== req.body.userImage) {
                             fs.unlink(`uploads/${results[0].userImage}`, (err) => {
                                 if (err) {
-                                    reject({
-                                        success: false,
-                                        message: `error: ${err.code}`,
-                                        data: []
-                                    })
+                                    prevData = {
+                                        ...prevData,
+                                        userImage: req.file.filename
+                                    }
                                 }
                             })
                             prevData = {
@@ -208,11 +207,10 @@ module.exports = {
                         if (results[0].userImage !== req.body.userImage) {
                             fs.unlink(`uploads/${results[0].userImage}`, (err) => {
                                 if (err) {
-                                    reject({
-                                        success: false,
-                                        message: `error: ${err.code}`,
-                                        data: []
-                                    })
+                                    prevData = {
+                                        ...prevData,
+                                        userImage: req.file.filename
+                                    }
                                 }
                             })
                             prevData = {
@@ -271,11 +269,10 @@ module.exports = {
                         } else {
                             fs.unlink(`uploads/${imagetmp}`, (err) => {
                                 if (err) {
-                                    reject({
-                                        success: false,
-                                        message: `error: ${err.code}`,
-                                        data: []
-                                    })
+                                    prevData = {
+                                        ...prevData,
+                                        userImage: req.file.filename
+                                    }
                                 }
                                 resolve({
                                     success: true,
