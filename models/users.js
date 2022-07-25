@@ -59,8 +59,8 @@ module.exports = {
     },
     getByUsers: (req, res) => {
         return new Promise((resolve, reject) => {
-            const { email } = req.query
-            const sql = `SELECT * FROM users WHERE email = '${email}'`
+            const { userId } = req.query
+            const sql = `SELECT * FROM users WHERE userId = '${userId}'`
             db.query(sql, (err, results) => {
                 if (err || results.length === 0) {
                     reject({
