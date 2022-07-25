@@ -31,6 +31,13 @@ some technology used in this project.
 - [MySQL](https://mysql.com)
 - [Sendinblue (email marketing)](https://www.sendinblue.com)
 
+### Documentation
+
+[Postman](https://documenter.getpostman.com/view/21597644/UzR1Ki4t#332587b8-bc2a-49d9-8080-4c705bda006a)
+
+### Related
+
+[News Today(Frontend)](https://github.com/bracket-technology/newstoday)
 
 <!-- GETTING STARTED -->
 
@@ -62,37 +69,21 @@ yarn install
 
 - create `.env` file
 
-  ```sh
-  touch .env
-  ```
+```sh
+touch .env
+```
 
 - Add configuration in `.env` file
 
-```
-host = yourdbhostname
-user = yourdbusername
-password = yourdbpassword
-database = yourdbdatabasename
-
-SECRET_KEY_CRYPT = yoursecretkeycrypto
-
-SECRET_KEY_JWT = yoursecretkeyjwt
-
-API_KEY_SENDINBLUE =yourkeysendinblue
-
-EMAIL_SENDER = yourdefaultemail
-
-LINK_VERIFY = yourlinkverify
-LINK_FORGOT_PASS = yourlinkforgotpass
-
-PORT = yourport
+```sh
+configuration .env look in .env.example
 
 ```
 
 
 1. Start the project
 
-```sh
+```
 yarn start
 ```
 
