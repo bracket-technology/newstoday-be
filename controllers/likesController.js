@@ -3,7 +3,7 @@ const Likes = require('../models/likes')
 module.exports = {
     createLikes: async (req, res) => {
         try {
-            const results = await Likes.create(req, res)
+            const results = await Likes.add(req, res)
             return res.status(200).send(results)
         } catch (error) {
             return res.status(500).send(error)
