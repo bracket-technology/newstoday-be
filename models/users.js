@@ -240,6 +240,56 @@ module.exports = {
             })
         })
     },
+    requestAuthor: (request, userId) => {
+        return new Promise((resolve, reject) => {
+            const dbQuery = db.query(`UPDATE users SET request='${request}' WHERE userId=?`, userId, (err, results) => {
+                if (err) {
+                    reject({
+                        success: false, message: err.sqlMessage, data: {
+                            errCode: err.code, errNo: err.errno
+                        }
+                    })
+                }
+                resolve({
+                    userId, request
+                })
+            })
+            console.log(dbQuery.sql)
+        })
+    },
+    getUsersReqAuthor: () => {
+        return new Promise((resolve, reject) => {
+            db.query(`SELECT userId,username,name,email,phone,job FROM users WHERE request='1'`, (err, results) => {
+                if (err) {
+                    reject({
+                        success: false, message: err.sqlMessage, data: {
+                            errCode: err.code, errNo: err.errno
+                        }
+                    })
+                }
+                resolve({
+                    results
+                })
+            })
+        })
+    },
+    accAuthorByAdmin: (role, userId) => {
+        return new Promise((resolve, reject) => {
+            const dbQuery = db.query(`UPDATE users SET role='${role}' WHERE userId=?`, userId, (err, results) => {
+                if (err) {
+                    reject({
+                        success: false, message: err.sqlMessage, data: {
+                            errCode: err.code, errNo: err.errno
+                        }
+                    })
+                }
+                resolve({
+                    userId, role
+                })
+            })
+            console.log(dbQuery.sql)
+        })
+    },
     deleteByAdmin: (req, res) => {
         return new Promise((resolve, reject) => {
             const { userId } = req.params
