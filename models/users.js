@@ -319,10 +319,11 @@ module.exports = {
                         } else {
                             fs.unlink(`uploads/${imagetmp}`, (err) => {
                                 if (err) {
-                                    prevData = {
-                                        ...prevData,
-                                        userImage: req.file.filename
-                                    }
+                                    resolve({
+                                        success: true,
+                                        message: 'delete user success',
+                                        data: results
+                                    })
                                 }
                                 resolve({
                                     success: true,
