@@ -1,4 +1,4 @@
-const {getAllBookmark, getBookmarkByUsers, addBookmark, updateBookmark, deleteBookmark} = require('../models/bookmarks')
+const { getAllBookmark, getBookmarkByUsers, addBookmark, updateBookmark, deleteBookmark } = require('../models/bookmarks')
 
 const getAll = async (req, res) => {
     try {
@@ -36,7 +36,7 @@ const update = async (req, res) => {
     }
 }
 
-const deleteBookmark = async (req, res) => {
+const deletebookmark = async (req, res) => {
     try {
         const results = await deleteBookmark(req, res)
         return res.status(200).send(results)
@@ -45,4 +45,4 @@ const deleteBookmark = async (req, res) => {
     }
 }
 
-module.exports = {getAll, getByUsers, add, update, deleteBookmark}
+module.exports = { getAll, getByUsers, add, update, deletebookmark }

@@ -5,17 +5,16 @@ const authRoutes = require('./authRoutes')
 const newsRouters = require('./newsRoutes')
 const categoryRoutes = require('./categoryRoutes')
 const bookmarkRoutes = require('./bookmarkRoutes')
-const {isLogin, isAdmin } = require('../middlewares/auth')
+const { isLogin, isAdmin } = require('../middlewares/auth')
 const commentRoutes = require('./commentsRoutes')
 const friendsRoutes = require('./friendsRoutes')
-const { isLogin, isAdmin } = require('../middlewares/auth')
 
 
 
 app.use('/users', isLogin, usersRoutes)
 app.use('/auth', authRoutes)
-app.use('/category',isLogin,isAdmin, categoryRoutes)
-app.use('/bookmark',isLogin, bookmarkRoutes)
+app.use('/category', isLogin, isAdmin, categoryRoutes)
+app.use('/bookmark', isLogin, bookmarkRoutes)
 
 
 app.use('/news', newsRouters)
