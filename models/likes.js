@@ -1,7 +1,7 @@
 const db = require('../helpers/db_conn');
 
-module.export = {
-    create: (req, res) => {
+module.exports = {
+    add: (req, res) => {
         const { userId, newsId } = req.body
         return new Promise ((resolve, reject) => {
             const sql = `INSERT INTO likes (userId, newsId) VALUES ('${userId}', '${newsId}')`
@@ -29,7 +29,7 @@ module.export = {
         const limit = parseInt(req.query.limit)
         const offset = (page - 1) * limit
         return new Promise ((resolve, reject) => {
-            const sql = `SELECT likes.*, users.name, news.title FROM likes JOIN users JOIN news ON likes.userId=users.userId AND likes.newsId=news.newsId WHERE likes.userId = '${userId}' ORDER BY ${orderBy} likesId LIMIT ${limit} OFFSET ${offset}`
+            const sql = `SELECT likes.*, users.name, news.title FROM likes JOIN users JOIN news ON likes.userId=users.userId AND likes.newsId=news.newsId WHERE likes.userId = '${userId}' ORDER BY ${orderBy} likes LIMIT ${limit} OFFSET ${offset}`
             db.query(sql, (err, results) => {
                 if (err) {
                     reject({
@@ -122,10 +122,10 @@ module.export = {
         })
     }, 
     remove: (req, res) => {
-        const {likesId} = req.body
+        const { likeId } = req.params
         return new Promise ((resolve, reject) => {
-            const sql = `DELETE FROM likes WHERE likesId=${likesId}`
-            db.query(sql, likesId, (err, results) => {
+            const sql = `DELETE FROM likes WHERE likeId=${likeId}`
+            db.query(sql, (err, results) => {
                 if (err) {
                     reject({
                         success: false,

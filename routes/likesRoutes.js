@@ -6,7 +6,7 @@ const { createLikes, getLikesByUserId, getLikesByNewsId, deleteLikes } = require
 router.post('/', createLikes)
 router.get('/:userId', getLikesByUserId)
 router.get('/:newsId', getLikesByNewsId)
-router.delete('/:likesId', deleteLikes)
+router.delete('/:likeId', deleteLikes)
 
 
 
