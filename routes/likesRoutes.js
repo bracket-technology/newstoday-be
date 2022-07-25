@@ -1,7 +1,6 @@
 const express = require("express")
 const router = express.Router()
 const { createLikes, getLikesByUserId, getLikesByNewsId, deleteLikes } = require('../controllers/likesController')
-const { isAdmin } = require('../middlewares/auth')
 
 
 router.post('/', createLikes)
