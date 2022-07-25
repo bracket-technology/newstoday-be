@@ -69,6 +69,34 @@ module.exports = {
             return res.status(500).send(error)
         }
     },
+    requestAuthor: async (req, res) => {
+        try {
+            let { userId } = req.params
+            const { request } = req.body
+            const results = await Users.requestAuthor(request, userId)
+            return res.status(200).json({ success: true, message: "Success request to be author" })
+        } catch (error) {
+            return res.status(400).json({ success: false, message: `Error: ${error.message}` })
+        }
+    },
+    getUsersReqAuthor: async (req, res) => {
+        try {
+            const results = await Users.getUsersReqAuthor()
+            return res.status(200).json({ success: true, message: "Success get all users who request to be author", data: results })
+        } catch (error) {
+            return res.status(400).json({ success: false, message: `Error: ${error.message}` })
+        }
+    },
+    accAuthorByAdmin: async (req, res) => {
+        try {
+            const { userId } = req.params
+            let { role } = req.body
+            const results = await Users.accAuthorByAdmin(role, userId)
+            return res.status(200).json({ success: true, message: `success make userID ${userId} an author` })
+        } catch (error) {
+            return res.status(400).json({ success: false, message: `Error: ${error.message}` })
+        }
+    },
     deleteUser: async (req, res) => {
         try {
             const results = await Users.deleteByAdmin(req, res)
@@ -76,5 +104,6 @@ module.exports = {
         } catch (error) {
             return res.status(500).send(error)
         }
-    }
+    },
+
 }

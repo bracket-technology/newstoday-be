@@ -59,8 +59,8 @@ module.exports = {
     },
     getByUsers: (req, res) => {
         return new Promise((resolve, reject) => {
-            const { email } = req.query
-            const sql = `SELECT * FROM users WHERE email = '${email}'`
+            const { userId } = req.query
+            const sql = `SELECT * FROM users WHERE userId = '${userId}'`
             db.query(sql, (err, results) => {
                 if (err || results.length === 0) {
                     reject({
@@ -148,11 +148,10 @@ module.exports = {
                         if (results[0].userImage !== req.body.userImage) {
                             fs.unlink(`uploads/${results[0].userImage}`, (err) => {
                                 if (err) {
-                                    reject({
-                                        success: false,
-                                        message: `error: ${err.code}`,
-                                        data: []
-                                    })
+                                    prevData = {
+                                        ...prevData,
+                                        userImage: req.file.filename
+                                    }
                                 }
                             })
                             prevData = {
@@ -208,11 +207,10 @@ module.exports = {
                         if (results[0].userImage !== req.body.userImage) {
                             fs.unlink(`uploads/${results[0].userImage}`, (err) => {
                                 if (err) {
-                                    reject({
-                                        success: false,
-                                        message: `error: ${err.code}`,
-                                        data: []
-                                    })
+                                    prevData = {
+                                        ...prevData,
+                                        userImage: req.file.filename
+                                    }
                                 }
                             })
                             prevData = {
@@ -240,6 +238,56 @@ module.exports = {
                     })
                 }
             })
+        })
+    },
+    requestAuthor: (request, userId) => {
+        return new Promise((resolve, reject) => {
+            const dbQuery = db.query(`UPDATE users SET request='${request}' WHERE userId=?`, userId, (err, results) => {
+                if (err) {
+                    reject({
+                        success: false, message: err.sqlMessage, data: {
+                            errCode: err.code, errNo: err.errno
+                        }
+                    })
+                }
+                resolve({
+                    userId, request
+                })
+            })
+            console.log(dbQuery.sql)
+        })
+    },
+    getUsersReqAuthor: () => {
+        return new Promise((resolve, reject) => {
+            db.query(`SELECT userId,username,name,email,phone,job FROM users WHERE request='1'`, (err, results) => {
+                if (err) {
+                    reject({
+                        success: false, message: err.sqlMessage, data: {
+                            errCode: err.code, errNo: err.errno
+                        }
+                    })
+                }
+                resolve({
+                    results
+                })
+            })
+        })
+    },
+    accAuthorByAdmin: (role, userId) => {
+        return new Promise((resolve, reject) => {
+            const dbQuery = db.query(`UPDATE users SET role='${role}' WHERE userId=?`, userId, (err, results) => {
+                if (err) {
+                    reject({
+                        success: false, message: err.sqlMessage, data: {
+                            errCode: err.code, errNo: err.errno
+                        }
+                    })
+                }
+                resolve({
+                    userId, role
+                })
+            })
+            console.log(dbQuery.sql)
         })
     },
     deleteByAdmin: (req, res) => {
@@ -271,10 +319,10 @@ module.exports = {
                         } else {
                             fs.unlink(`uploads/${imagetmp}`, (err) => {
                                 if (err) {
-                                    reject({
-                                        success: false,
-                                        message: `error: ${err.code}`,
-                                        data: []
+                                    resolve({
+                                        success: true,
+                                        message: 'delete user success',
+                                        data: results
                                     })
                                 }
                                 resolve({

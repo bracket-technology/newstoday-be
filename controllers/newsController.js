@@ -62,7 +62,7 @@ module.exports = {
   },
   postArticle: async (req, res) => {
     try {
-      let { userId, categoryId, title, content, newsImage, status } = req.body
+      let { userId, categoryId, title, descriptionNews, content, newsImage, status } = req.body
       newsImage = req.file ? req.file.filename : 'http://bppl.kkp.go.id/uploads/publikasi/karya_tulis_ilmiah/default.jpg'
       userId = req.decodeToken.userId
       if (req.decodeToken.role === 'writer') {
@@ -71,10 +71,10 @@ module.exports = {
       if (req.decodeToken.role === 'admin') {
         status = 'publish'
       }
-      if (!categoryId || !title || !content || !newsImage) {
+      if (!categoryId || !title || !descriptionNews || !content || !newsImage) {
         return res.status(404).json({ success: false, message: `Error: Fields must be filled` })
       }
-      const data = { userId, categoryId, title, content, newsImage }
+      const data = { userId, categoryId, title, descriptionNews, content, newsImage }
       const results = await News.postArticle(data)
       return res.status(200).json({ success: true, message: "Success create new article", data: results })
     } catch (error) {

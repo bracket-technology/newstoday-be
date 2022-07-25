@@ -134,11 +134,10 @@ module.exports = {
                         if (results[0].categoryImage !== req.body.categoryImage) {
                             fs.unlink(`uploads/category/${results[0].categoryImage}`, (err) => {
                                 if (err) {
-                                    reject({
-                                        success: false,
-                                        message: `Error: ${err.code}`,
-                                        data: []
-                                    })
+                                    prevData = {
+                                        ...prevData,
+                                        userImage: req.file.filename
+                                    }
                                 }
                             })
                             prevData = {
@@ -199,11 +198,10 @@ module.exports = {
                         } else {
                             fs.unlink(`uploads/category/${imagetmp}`, (err) => {
                                 if (err) {
-                                    reject({
-                                        success: false,
-                                        message: `error: ${err.code}`,
-                                        data: []
-                                    })
+                                    prevData = {
+                                        ...prevData,
+                                        userImage: req.file.filename
+                                    }
                                 }
                                 resolve({
                                     success: true,
